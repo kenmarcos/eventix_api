@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import cors from "cors";
 import connectDatabase from "./infra/database";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
 class App {
   public app: Application;
@@ -9,16 +10,20 @@ class App {
     this.app = express();
     this.initializeMiddlewares();
     this.initializeRoutes();
+    connectDatabase();
   }
 
   private initializeMiddlewares() {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-    connectDatabase();
   }
 
   private initializeRoutes() {}
+
+  private handleError() {
+    this.app.use(errorMiddleware);
+  }
 
   listen(port: number) {
     this.app.listen(port, () => {
