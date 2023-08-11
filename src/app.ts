@@ -1,5 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
+import connectDatabase from "./infra/database";
 
 class App {
   public app: Application;
@@ -13,6 +14,8 @@ class App {
   private initializeMiddlewares() {
     this.app.use(cors());
     this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
+    connectDatabase();
   }
 
   private initializeRoutes() {}
