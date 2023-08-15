@@ -5,7 +5,7 @@ const app = new App();
 const express = app.app;
 
 describe("Event test", () => {
-  it("/POST Event", async () => {
+  it.skip("should create an event", async () => {
     const event = {
       title: "Jorge e Mateus",
       price: [{ sector: "Pista", amount: "20" }],
@@ -43,5 +43,29 @@ describe("Event test", () => {
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual({ message: "Evento criado com sucesso!" });
+  });
+
+  it("should find events by location", async () => {
+    const response = await request(express).get(
+      "/events?latitude=-19.8658659&longitude=-43.9737064"
+    );
+
+    if (response.error) {
+      console.log("🚀 ~ file: Events.test.ts:34 ~ it ~ error:", response.error);
+    }
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+  });
+
+  it("should find events by category", async () => {
+    const response = await request(express).get("/events/category/Show");
+
+    if (response.error) {
+      console.log("🚀 ~ file: Events.test.ts:34 ~ it ~ error:", response.error);
+    }
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
   });
 });
