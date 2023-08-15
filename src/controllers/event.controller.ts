@@ -56,4 +56,28 @@ export default class EventController {
       next(error);
     }
   }
+
+  async findEventsByTitle(req: Request, res: Response, next: NextFunction) {
+    const { title } = req.query;
+
+    try {
+      const events = await this.eventService.findEventsByTitle(String(title));
+
+      return res.status(200).json(events);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async findEventById(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    try {
+      const event = await this.eventService.findEventById(id);
+
+      return res.status(200).json(event);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -82,6 +82,30 @@ export default class EventService {
     return foundEventsByCategory;
   }
 
+  async findEventsByTitle(title: string) {
+    if (!title) {
+      throw new AppError(400, "Title is required");
+    }
+
+    const foundEventsByTitle = this.eventRepository.findEventsByTitle(title);
+
+    return foundEventsByTitle;
+  }
+
+  async findEventById(id: string) {
+    if (!id) {
+      throw new AppError(400, "Id is required");
+    }
+
+    const foundEvent = await this.eventRepository.findEventById(id);
+
+    if (!foundEvent) {
+      throw new AppError(404, "Event not found");
+    }
+
+    return foundEvent;
+  }
+
   private async getCityNameByCoordinates(latitude: string, longitude: string) {
     try {
       const response = await axios.get(

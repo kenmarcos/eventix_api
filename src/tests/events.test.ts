@@ -1,11 +1,13 @@
 import request from "supertest";
 import { App } from "../app";
+import EventService from "../services/event.service";
+import Event from "../entities/Event";
 
 const app = new App();
 const express = app.app;
 
 describe("Event test", () => {
-  it.skip("should create an event", async () => {
+  it.skip("/POST - create event", async () => {
     const event = {
       title: "Jorge e Mateus",
       price: [{ sector: "Pista", amount: "20" }],
@@ -45,7 +47,7 @@ describe("Event test", () => {
     expect(response.body).toEqual({ message: "Evento criado com sucesso!" });
   });
 
-  it("should find events by location", async () => {
+  it("/GET - get event by location", async () => {
     const response = await request(express).get(
       "/events?latitude=-19.8658659&longitude=-43.9737064"
     );
@@ -58,7 +60,7 @@ describe("Event test", () => {
     expect(response.body.length).toBeGreaterThan(0);
   });
 
-  it("should find events by category", async () => {
+  it("/GET - get event by category", async () => {
     const response = await request(express).get("/events/category/Show");
 
     if (response.error) {
@@ -67,5 +69,81 @@ describe("Event test", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.length).toBeGreaterThan(0);
+  });
+
+  it("/GET/:id - get event by id", async () => {
+    const response = await request(express).get(
+      "/events/64db6b5ce0c33922af110ef4"
+    );
+
+    if (response.error) {
+      console.log("🚀 ~ file: Events.test.ts:34 ~ it ~ error:", response.error);
+    }
+
+    expect(response.status).toBe(200);
+  });
+});
+
+const eventRepository = {
+  add: jest.fn(),
+  findEventsByCategory: jest.fn(),
+  findEventsByCity: jest.fn(),
+  findByLocationAndDate: jest.fn(),
+  findEventsByTitle: jest.fn(),
+  findEventById: jest.fn(),
+};
+const eventService = new EventService(eventRepository);
+const event: Event = {
+  title: "Jorge e Mateus",
+  price: [{ sector: "Pista", amount: "20" }],
+  categories: ["Show"],
+  description: "Evento descrição",
+  city: "Belo Horizonte",
+  location: {
+    latitude: "-19.8658659",
+    longitude: "-43.9737064",
+  },
+  banner: "banner.png",
+  flyers: ["flyer1.png", "flyer2.png"],
+  coupons: [],
+  date: new Date(),
+  participants: [],
+  formattedAddress: "Rua A, 123",
+};
+
+describe("Unit tests", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should return an array of events by category", async () => {
+    eventRepository.findEventsByCategory.mockResolvedValue([event]);
+
+    const result = await eventService.findEventsByCategory("Show");
+
+    expect(result).toEqual([event]);
+    expect(eventRepository.findEventsByCategory).toHaveBeenCalledWith("Show");
+  });
+
+  it("should return an array of events by title", async () => {
+    eventRepository.findEventsByTitle.mockResolvedValue([event]);
+
+    const result = await eventService.findEventsByTitle("Jorge e Mateus");
+
+    expect(result).toEqual([event]);
+    expect(eventRepository.findEventsByTitle).toHaveBeenCalledWith(
+      "Jorge e Mateus"
+    );
+  });
+
+  it("should return an event by Id", async () => {
+    eventRepository.findEventById.mockResolvedValueOnce(event);
+
+    const result = await eventService.findEventById("64db6b5ce0c33922af110ef4");
+
+    expect(result).toEqual(event);
+    expect(eventRepository.findEventById).toHaveBeenCalledWith(
+      "64db6b5ce0c33922af110ef4"
+    );
   });
 });

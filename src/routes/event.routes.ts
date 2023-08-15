@@ -41,5 +41,15 @@ export default class EventRoutes {
       "/category/:category",
       this.eventController.findEventsByCategory.bind(this.eventController)
     );
+
+    this.router.get(
+      "/event",
+      this.eventController.findEventsByTitle.bind(this.eventController)
+    );
+
+    this.router.get(
+      "/:id",
+      this.eventController.findEventById.bind(this.eventController)
+    );
   }
 }
