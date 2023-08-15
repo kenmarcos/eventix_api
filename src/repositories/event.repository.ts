@@ -1,5 +1,6 @@
 import Event from "../entities/Event";
 import Location from "../entities/Location";
+import User from "../entities/User";
 
 export default interface EventRepository {
   add(event: Event): Promise<Event>;
@@ -11,4 +12,5 @@ export default interface EventRepository {
   findEventsByCategory(category: string): Promise<Event[]>;
   findEventsByTitle(title: string): Promise<Event[]>;
   findEventById(id: string): Promise<Event | undefined>;
+  update(event: Event, id: string): Promise<any>;
 }

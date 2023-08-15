@@ -3,6 +3,7 @@ import AppError from "../errors/appError";
 import EventRepository from "../repositories/event.repository";
 import axios from "axios";
 import dotenv from "dotenv";
+import { UserRepositoryMongoose } from "../repositories/user.repository.mongoose";
 
 dotenv.config();
 
@@ -104,6 +105,45 @@ export default class EventService {
     }
 
     return foundEvent;
+  }
+
+  async addParticipant(id: string, name: string, email: string) {
+    const event = await this.eventRepository.findEventById(id);
+
+    if (!event) {
+      throw new AppError(404, "Event not found");
+    }
+
+    const userRepository = new UserRepositoryMongoose();
+
+    const participant = {
+      name,
+      email,
+    };
+
+    let user: any = {};
+
+    const verifyIfUserExists = await userRepository.verifyIfUserExists(email);
+
+    if (!verifyIfUserExists) {
+      user = await userRepository.add(participant);
+    } else {
+      user = verifyIfUserExists;
+    }
+
+    if (event.participants.includes(user._id)) {
+      throw new AppError(409, "User already exists");
+    }
+
+    console.log(
+      "🚀 ~ file: event.service.ts:133 ~ EventService ~ addParticipant ~ user:",
+      user
+    );
+    event.participants.push(user._id);
+
+    await this.eventRepository.update(event, id);
+
+    return event;
   }
 
   private async getCityNameByCoordinates(latitude: string, longitude: string) {

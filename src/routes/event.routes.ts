@@ -51,5 +51,10 @@ export default class EventRoutes {
       "/:id",
       this.eventController.findEventById.bind(this.eventController)
     );
+
+    this.router.post(
+      "/:id/participant",
+      this.eventController.addParticipant.bind(this.eventController)
+    );
   }
 }

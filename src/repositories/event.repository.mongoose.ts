@@ -18,7 +18,7 @@ const eventSchema = new mongoose.Schema({
   banner: String,
   flyers: [String],
   coupons: [String],
-  participans: {
+  participants: {
     type: Array,
     ref: "User",
   },
@@ -79,5 +79,11 @@ export class EventRepositoryMongoose implements EventRepository {
     const foundEvent = await EventModel.findOne({ _id: id }).exec();
 
     return foundEvent ? foundEvent.toObject() : undefined;
+  }
+
+  async update(event: Event, id: string): Promise<any> {
+    const eventUpdate = await EventModel.updateMany({ _id: id }, event);
+
+    return eventUpdate;
   }
 }

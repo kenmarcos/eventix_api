@@ -80,4 +80,17 @@ export default class EventController {
       next(error);
     }
   }
+
+  async addParticipant(req: Request, res: Response, next: NextFunction) {
+    const { name, email } = req.body;
+    const { id } = req.params;
+
+    try {
+      const events = await this.eventService.addParticipant(id, name, email);
+
+      return res.status(200).json(events);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

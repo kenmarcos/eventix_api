@@ -2,6 +2,7 @@ import request from "supertest";
 import { App } from "../app";
 import EventService from "../services/event.service";
 import Event from "../entities/Event";
+import crypto from "node:crypto";
 
 const app = new App();
 const express = app.app;
@@ -73,12 +74,23 @@ describe("Event test", () => {
 
   it("/GET/:id - get event by id", async () => {
     const response = await request(express).get(
-      "/events/64db6b5ce0c33922af110ef4"
+      "/events/64dbcd79bcf517573f549cd8"
     );
 
     if (response.error) {
       console.log("🚀 ~ file: Events.test.ts:34 ~ it ~ error:", response.error);
     }
+
+    expect(response.status).toBe(200);
+  });
+
+  it.only("/POST - insert user", async () => {
+    const response = await request(express)
+      .post("/events/64dbcd79bcf517573f549cd8/participant")
+      .send({
+        name: "teste",
+        email: crypto.randomBytes(10).toString("hex") + "@teste.com",
+      });
 
     expect(response.status).toBe(200);
   });
@@ -91,6 +103,7 @@ const eventRepository = {
   findByLocationAndDate: jest.fn(),
   findEventsByTitle: jest.fn(),
   findEventById: jest.fn(),
+  update: jest.fn(),
 };
 const eventService = new EventService(eventRepository);
 const event: Event = {
@@ -139,11 +152,11 @@ describe("Unit tests", () => {
   it("should return an event by Id", async () => {
     eventRepository.findEventById.mockResolvedValueOnce(event);
 
-    const result = await eventService.findEventById("64db6b5ce0c33922af110ef4");
+    const result = await eventService.findEventById("64dbcd79bcf517573f549cd8");
 
     expect(result).toEqual(event);
     expect(eventRepository.findEventById).toHaveBeenCalledWith(
-      "64db6b5ce0c33922af110ef4"
+      "64dbcd79bcf517573f549cd8"
     );
   });
 });
