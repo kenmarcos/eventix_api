@@ -10,14 +10,14 @@ export default class EventController {
 
     const files = req.files as any;
 
-    if (files) {
+    if (Object.keys(files).length > 0) {
       const banner = files.banner[0];
       const flyers = files.flyers;
 
       eventData = {
         ...eventData,
-        banner: banner.filename,
-        flyers: flyers.map((flyer: any) => flyer.filename),
+        banner: banner ? banner.filename : "",
+        flyers: flyers ? flyers.map((flyer: any) => flyer.filename) : [],
       };
     }
 

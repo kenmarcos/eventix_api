@@ -57,7 +57,9 @@ export class EventRepositoryMongoose implements EventRepository {
   }
 
   async findEventsByCategory(category: string): Promise<Event[]> {
-    const foundEvents = await EventModel.find({ categories: category }).exec();
+    const foundEvents = await EventModel.find({ categories: category })
+      .collation({ locale: "pt", strength: 2 })
+      .exec();
 
     return foundEvents.map((event) => event.toObject());
   }

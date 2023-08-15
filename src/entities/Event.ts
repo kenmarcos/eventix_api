@@ -4,7 +4,7 @@ import User from "./User";
 
 export default class Event {
   constructor(
-    public name: string,
+    public title: string,
     public location: Location,
     public date: Date,
     public description: string,

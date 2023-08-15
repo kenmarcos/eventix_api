@@ -18,6 +18,10 @@ export default class EventService {
       throw new AppError(400, "Flyers are required");
     }
 
+    if (!eventData.date) {
+      throw new AppError(400, "Date is required");
+    }
+
     if (!eventData.location) {
       throw new AppError(400, "Location is required");
     }
@@ -31,7 +35,7 @@ export default class EventService {
       throw new AppError(409, "Event already exists");
     }
 
-    const cityName = await this.getCityNameByCoordinats(
+    const cityName = await this.getCityNameByCoordinates(
       eventData.location.latitude,
       eventData.location.longitude
     );
@@ -46,7 +50,39 @@ export default class EventService {
     return newEvent;
   }
 
-  private async getCityNameByCoordinats(latitude: string, longitude: string) {
+  async findEventsByLocation(latitude: string, longitude: string) {
+    const cityName = await this.getCityNameByCoordinates(latitude, longitude);
+
+    const foundEventsByCity = await this.eventRepository.findEventsByCity(
+      cityName
+    );
+
+    const eventsWithRadius = foundEventsByCity.filter((event) => {
+      const distance = this.calculateDistance(
+        Number(latitude),
+        Number(longitude),
+        Number(event.location.latitude),
+        Number(event.location.longitude)
+      );
+
+      return distance <= 3;
+    });
+
+    return eventsWithRadius;
+  }
+
+  async findEventsByCategory(category: string) {
+    if (!category) {
+      throw new AppError(400, "Category is required");
+    }
+
+    const foundEventsByCategory =
+      await this.eventRepository.findEventsByCategory(category);
+
+    return foundEventsByCategory;
+  }
+
+  private async getCityNameByCoordinates(latitude: string, longitude: string) {
     try {
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.GOOGLE_API_KEY}`
@@ -68,27 +104,6 @@ export default class EventService {
     } catch (error) {
       throw new AppError(401, "Error request city name");
     }
-  }
-
-  async findEventsByLocation(latitude: string, longitude: string) {
-    const cityName = await this.getCityNameByCoordinats(latitude, longitude);
-
-    const foundEventsByCity = await this.eventRepository.findEventsByCity(
-      cityName
-    );
-
-    const eventsWithRadius = foundEventsByCity.filter((event) => {
-      const distance = this.calculateDistance(
-        Number(latitude),
-        Number(longitude),
-        Number(event.location.latitude),
-        Number(event.location.longitude)
-      );
-
-      return distance <= 3;
-    });
-
-    return eventsWithRadius;
   }
 
   private calculateDistance(
@@ -113,16 +128,5 @@ export default class EventService {
 
   private deg2rad(deg: number): number {
     return deg * (Math.PI / 180);
-  }
-
-  async findEventsByCategory(category: string) {
-    if (!category) {
-      throw new AppError(400, "Category is required");
-    }
-
-    const foundEventsByCategory =
-      await this.eventRepository.findEventsByCategory(category);
-
-    return foundEventsByCategory;
   }
 }
