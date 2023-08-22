@@ -3,6 +3,7 @@ import cors from "cors";
 import connectDatabase from "./infra/database";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import EventRoutes from "./routes/event.routes";
+import path from "node:path";
 
 class App {
   public app: Application;
@@ -19,6 +20,10 @@ class App {
   private initializeMiddlewares() {
     this.app.use(cors());
     this.app.use(express.json());
+    this.app.use(
+      "/uploads",
+      express.static(path.join(__dirname, ".", "tmp", "uploads"))
+    );
     this.app.use(express.urlencoded({ extended: true }));
   }
 
