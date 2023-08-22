@@ -10,6 +10,7 @@ export default interface EventRepository {
   ): Promise<Event | undefined>;
   findEventsByCity(city: string): Promise<Event[]>;
   findEventsByCategory(category: string): Promise<Event[]>;
+  findFeaturedEvents(date: Date): Promise<Event[]>;
   findEventsByTitle(title: string): Promise<Event[]>;
   findEventById(id: string): Promise<Event | undefined>;
   update(event: Event, id: string): Promise<any>;

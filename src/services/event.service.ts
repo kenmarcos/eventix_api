@@ -36,14 +36,15 @@ export default class EventService {
       throw new AppError(409, "Event already exists");
     }
 
-    const cityName = await this.getCityNameByCoordinates(
+    const city = await this.getCityNameByCoordinates(
       eventData.location.latitude,
       eventData.location.longitude
     );
 
     eventData = {
       ...eventData,
-      city: cityName,
+      city: city.cityName,
+      formattedAddress: city.formattedAddress,
     };
 
     const newEvent = await this.eventRepository.add(eventData);
@@ -52,10 +53,10 @@ export default class EventService {
   }
 
   async findEventsByLocation(latitude: string, longitude: string) {
-    const cityName = await this.getCityNameByCoordinates(latitude, longitude);
+    const city = await this.getCityNameByCoordinates(latitude, longitude);
 
     const foundEventsByCity = await this.eventRepository.findEventsByCity(
-      cityName
+      city.cityName
     );
 
     const eventsWithRadius = foundEventsByCity.filter((event) => {
@@ -79,6 +80,14 @@ export default class EventService {
 
     const foundEventsByCategory =
       await this.eventRepository.findEventsByCategory(category);
+
+    return foundEventsByCategory;
+  }
+
+  async findFeaturedEvents() {
+    const foundEventsByCategory = await this.eventRepository.findFeaturedEvents(
+      new Date()
+    );
 
     return foundEventsByCategory;
   }
@@ -161,7 +170,12 @@ export default class EventService {
             type.types.includes("political")
         );
 
-        return cityType.long_name;
+        const formattedAddress = response.data.results[0].formatted_address;
+
+        return {
+          cityName: cityType.long_name,
+          formattedAddress,
+        };
       }
 
       throw new AppError(404, "City not found");

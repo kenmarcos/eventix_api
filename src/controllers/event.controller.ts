@@ -57,6 +57,16 @@ export default class EventController {
     }
   }
 
+  async findFeaturedEvents(req: Request, res: Response, next: NextFunction) {
+    try {
+      const events = await this.eventService.findFeaturedEvents();
+
+      return res.status(200).json(events);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async findEventsByTitle(req: Request, res: Response, next: NextFunction) {
     const { title } = req.query;
 

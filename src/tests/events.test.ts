@@ -8,7 +8,7 @@ const app = new App();
 const express = app.app;
 
 describe("Event test", () => {
-  it.skip("/POST - create event", async () => {
+  it("/POST - create event", async () => {
     const event = {
       title: "Jorge e Mateus",
       price: [{ sector: "Pista", amount: "20" }],
@@ -84,7 +84,7 @@ describe("Event test", () => {
     expect(response.status).toBe(200);
   });
 
-  it.only("/POST - insert user", async () => {
+  it("/POST - insert user", async () => {
     const response = await request(express)
       .post("/events/64dbcd79bcf517573f549cd8/participant")
       .send({
@@ -99,6 +99,7 @@ describe("Event test", () => {
 const eventRepository = {
   add: jest.fn(),
   findEventsByCategory: jest.fn(),
+  findFeaturedEvents: jest.fn(),
   findEventsByCity: jest.fn(),
   findByLocationAndDate: jest.fn(),
   findEventsByTitle: jest.fn(),

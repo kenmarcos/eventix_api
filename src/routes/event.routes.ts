@@ -43,6 +43,11 @@ export default class EventRoutes {
     );
 
     this.router.get(
+      "/featuredEvents",
+      this.eventController.findFeaturedEvents.bind(this.eventController)
+    );
+
+    this.router.get(
       "/event",
       this.eventController.findEventsByTitle.bind(this.eventController)
     );
