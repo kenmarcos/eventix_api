@@ -7,6 +7,12 @@ import { UserRepositoryMongoose } from "../repositories/user.repository.mongoose
 
 dotenv.config();
 
+export interface FilterEventsProps {
+  title: string;
+  date: string;
+  category: string;
+}
+
 export default class EventService {
   constructor(private eventRepository: EventRepository) {}
 
@@ -82,6 +88,16 @@ export default class EventService {
       await this.eventRepository.findEventsByCategory(category);
 
     return foundEventsByCategory;
+  }
+
+  async filterEvents({ title, date, category }: FilterEventsProps) {
+    const events = await this.eventRepository.findEventsByFilter({
+      title,
+      date,
+      category,
+    });
+
+    return events;
   }
 
   async findFeaturedEvents() {

@@ -38,6 +38,11 @@ export default class EventRoutes {
     );
 
     this.router.get(
+      "/filter",
+      this.eventController.filterEvents.bind(this.eventController)
+    );
+
+    this.router.get(
       "/category/:category",
       this.eventController.findEventsByCategory.bind(this.eventController)
     );

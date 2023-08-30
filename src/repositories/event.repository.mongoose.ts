@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Event from "../entities/Event";
 import EventRepository from "./event.repository";
 import Location from "../entities/Location";
+import { FilterEventsProps } from "../services/event.service";
 
 const eventSchema = new mongoose.Schema({
   title: String,
@@ -62,6 +63,45 @@ export class EventRepositoryMongoose implements EventRepository {
       .exec();
 
     return foundEvents.map((event) => event.toObject());
+  }
+
+  async findEventsByFilter({
+    title,
+    date,
+    category,
+  }: FilterEventsProps): Promise<Event[]> {
+    console.log(
+      "🚀 ~ file: event.repository.mongoose.ts:73 ~ EventRepositoryMongoose ~ date:",
+      typeof date
+    );
+    const query = {
+      $and: [
+        {
+          title:
+            title !== "undefined"
+              ? { $regex: title, $options: "i" }
+              : { $exists: true },
+        },
+
+        {
+          date: date
+            ? {
+                $gte: new Date(date),
+                $lt: new Date(date).setDate(new Date(date).getDate() + 1),
+              }
+            : { $exists: true },
+        },
+
+        {
+          categories:
+            category !== "undefined" ? { $in: category } : { $exists: true },
+        },
+      ],
+    };
+
+    const findEvents = await EventModel.find(query).exec();
+
+    return findEvents.map((event) => event.toObject());
   }
 
   async findFeaturedEvents(date: Date): Promise<Event[]> {

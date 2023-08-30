@@ -45,6 +45,22 @@ export default class EventController {
     }
   }
 
+  async filterEvents(req: Request, res: Response, next: NextFunction) {
+    const { latitude, longitude, title, date, category, radius } = req.query;
+
+    try {
+      const events = await this.eventService.filterEvents({
+        title: String(title),
+        date: String(date),
+        category: String(category),
+      });
+
+      return res.status(200).json(events);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async findEventsByCategory(req: Request, res: Response, next: NextFunction) {
     const { category } = req.params;
 
