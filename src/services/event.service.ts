@@ -156,15 +156,11 @@ export default class EventService {
       user = verifyIfUserExists;
     }
 
-    if (event.participants.includes(user._id)) {
+    if (event.participants.includes(user._id.toString())) {
       throw new AppError(409, "User already exists");
     }
 
-    console.log(
-      "🚀 ~ file: event.service.ts:133 ~ EventService ~ addParticipant ~ user:",
-      user
-    );
-    event.participants.push(user._id);
+    event.participants.push(user._id.toString());
 
     await this.eventRepository.update(event, id);
 

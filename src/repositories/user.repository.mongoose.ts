@@ -3,10 +3,6 @@ import User from "../entities/User";
 import UserRepository from "./user.repository";
 
 const userchema = new mongoose.Schema({
-  _id: {
-    type: String,
-    default: new mongoose.Types.ObjectId().toString(),
-  },
   name: String,
   email: String,
 });
